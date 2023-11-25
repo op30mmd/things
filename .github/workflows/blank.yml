@@ -1,14 +1,48 @@
-name: Download file
+name: Download and Upload Release Assets
+
 on:
   push:
     branches: [ main ]
+
 jobs:
-  download:
+  download-and-upload:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifact
+      - uses: actions/checkout@v3
+
+      - name: Download release assets from external URL
+        id: download-external
+        run: |
+          curl -o ./release-assets/release-assets.zip <URL>
+          # Replace <URL> with the actual URL of the release assets
+
+      - name: Download release assets
+        id: download
         uses: actions/download-artifact@v3
         with:
-          name: my-file.txt
-          url: https://example.com/my-file.txt
+          name: release-assets
+          path: ./release-assets
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-assets
+          path: ./release-assets
+          retention-days: 30
+
+      - name: Create release
+        id: create-release
+        uses: actions/create-release@v3
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          release_name: ${{ github.event.release.tag_name }}
+          draft: false
+
+      - name: Upload release assets to release
+        uses: softprops/action-gh-release@v3.3.1
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./release-assets/*
+          asset_name: ${{ steps.download.outputs.artifacts[0].name }}
+          asset_content_type: ${{ steps.download.outputs.artifacts[0].content_type }}
