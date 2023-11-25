@@ -1,0 +1,6 @@
+steps:
+  - name: Download file
+    uses: actions/download-artifact@v3
+    with:
+      name: my-file.txt
+      url: https://example.com/my-file.txt 
