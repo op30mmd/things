@@ -1,3 +1,6 @@
+on:
+  push:
+    branches: [ main ]
 steps:
   - name: Download file
     uses: actions/download-artifact@v3
