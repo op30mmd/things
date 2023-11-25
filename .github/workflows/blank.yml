@@ -1,9 +1,14 @@
+name: Download file
 on:
   push:
     branches: [ main ]
-steps:
-  - name: Download file
-    uses: actions/download-artifact@v3
-    with:
-      name: my-file.txt
-      url: https://example.com/my-file.txt 
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: my-file.txt
+          url: https://example.com/my-file.txt
