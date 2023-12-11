@@ -9,3 +9,4 @@ num = int(input("Enter a number: "))
 result = factorial(num)
 
 print("The factorial of", num, "is", result)
+print("now fuck off")
