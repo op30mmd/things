@@ -12,7 +12,7 @@ def main():
   exclusive_group = parser.add_mutually_exclusive_group()
 
   # Add options to the group
-  exclusive_group.add_argument("-h", "--help", action="store_true", help="Display help message")
+  exclusive_group.add_argument("--help", action="store_true", help="Display help message")
   exclusive_group.add_argument("-l", "--list", action="store_true", help="List files and directories")
   parser.add_argument("-d", "--directory", default=os.getcwd(), help="Set the starting directory")
   parser.add_argument("-c", "--copy", help="Copy a file or directory")
