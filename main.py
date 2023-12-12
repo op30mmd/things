@@ -1,35 +1,39 @@
 import os
+import argparse
+import shutil
 
 def main():
   """
   Main function of the CLI file manager.
   """
-  # Display current directory
-  print(f"Current directory: {os.getcwd()}")
+  parser = argparse.ArgumentParser(description="A simple CLI file manager")
+  parser.add_argument("-d", "--directory", default=os.getcwd(), help="Set the starting directory")
+  parser.add_argument("-l", "--list", action="store_true", help="List files and directories")
+  parser.add_argument("-c", "--copy", help="Copy a file or directory")
+  parser.add_argument("-m", "--move", help="Move a file or directory")
+  parser.add_argument("-r", "--rename", nargs=2, help="Rename a file or directory")
+  parser.add_argument("-p", "--permission", help="Change file permissions")
+  parser.add_argument("-h", "--help", action="store_true", help="Display help message")
 
-  # Get user input
-  user_input = ""
-  while user_input.lower() != "exit":
-    user_input = input("> ").strip()
+  args = parser.parse_args()
 
-    # Handle different commands
-    if user_input == "ls":
-      # List files and directories
-      list_files_and_directories()
-    elif user_input.startswith("cd"):
-      # Change directory
-      change_directory(user_input)
-    elif user_input.startswith("mkdir"):
-      # Create directory
-      create_directory(user_input)
-    elif user_input.startswith("rm"):
-      # Remove file or directory
-      remove_file_or_directory(user_input)
-    elif user_input == "help":
-      # Display help message
-      print_help()
-    else:
-      print(f"Unknown command: '{user_input}'")
+  # Set starting directory
+  os.chdir(args.directory)
+
+  if args.list:
+    list_files_and_directories()
+  elif args.copy:
+    copy_file_or_directory(args.copy)
+  elif args.move:
+    move_file_or_directory(args.move)
+  elif args.rename:
+    rename_file_or_directory(args.rename[0], args.rename[1])
+  elif args.permission:
+    change_file_permissions(args.permission)
+  elif args.help:
+    print_help()
+  else:
+    print("No command specified. Use --help for available commands.")
 
 def list_files_and_directories():
   """
@@ -41,46 +45,53 @@ def list_files_and_directories():
     elif os.path.isdir(entry):
       print(f"\t[DIR] {entry}")
 
-def change_directory(command):
+def copy_file_or_directory(source):
   """
-  Change the current directory.
+  Copy a file or directory.
   """
+  target = input("Enter target path: ")
   try:
-    os.chdir(command[3:])
-  except FileNotFoundError:
-    print(f"Error: Directory '{command[3:]}' does not exist.")
+    if os.path.isdir(source):
+      shutil.copytree(source, target)
+    else:
+      shutil.copy2(source, target)
+    print(f"Successfully copied '{source}' to '{target}'")
+  except Exception as e:
+    print(f"Error copying '{source}': {e}")
 
-def create_directory(command):
+def move_file_or_directory(source):
   """
-  Create a new directory.
+  Move a file or directory.
   """
+  target = input("Enter target path: ")
   try:
-    os.mkdir(command[4:])
-  except FileExistsError:
-    print(f"Error: Directory '{command[4:]}' already exists.")
+    shutil.move(source, target)
+    print(f"Successfully moved '{source}' to '{target}'")
+  except Exception as e:
+    print(f"Error moving '{source}': {e}")
 
-def remove_file_or_directory(command):
+def rename_file_or_directory(source, target):
   """
-  Remove a file or directory.
+  Rename a file or directory.
   """
   try:
-    os.remove(command[3:])
-  except FileNotFoundError:
-    print(f"Error: File or directory '{command[3:]}' does not exist.")
-  except IsADirectoryError:
-    os.rmdir(command[3:])
+    os.rename(source, target)
+    print(f"Successfully renamed '{source}' to '{target}'")
+  except Exception as e:
+    print(f"Error renaming '{source}': {e}")
+
+def change_file_permissions(command):
+  """
+  Change file permissions.
+  """
+  # Implement permission change functionality
+  print("Feature under development!")
 
 def print_help():
   """
   Display a help message.
   """
-  print("\nAvailable commands:")
-  print("\tls: List files and directories in the current directory.")
-  print("\tcd <directory>: Change the current directory.")
-  print("\tmkdir <directory>: Create a new directory.")
-  print("\trm <file/directory>: Remove a file or directory.")
-  print("\thelp: Display this help message.")
-  print("\texit: Quit the program.\n")
+  print(parser.format_help())
 
 if __name__ == "__main__":
   main()
