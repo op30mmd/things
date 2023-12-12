@@ -1,12 +1,13 @@
-def factorial(n):
-  if n == 0:
-    return 1
-  else:
-    return n * factorial(n-1)
+import logging
 
-num = int(input("Enter a number: "))
+logging.basicConfig(filename="myapp.log", level=logging.DEBUG)
 
-result = factorial(num)
+logger = logging.getLogger(__name__)
 
-print("The factorial of", num, "is", result)
-print("now fuck off")
+def my_function(x):
+  logger.info("Starting my_function with x={}".format(x))
+  # ...
+  logger.debug("Returning {}".format(result))
+  return result
+
+result = my_function(10)
