@@ -111,4 +111,5 @@ def copy_file_or_directory(current_directory, command):
       shutil.copytree(source_path, target_path)
     else:
       shutil.copy2(source_path, target_path)
-  except Exception as e
+  except Exception as e :
+      print("Fucksses")
