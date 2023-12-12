@@ -7,20 +7,28 @@ def main():
   Main function of the CLI file manager.
   """
   parser = argparse.ArgumentParser(description="A simple CLI file manager")
+
+  # Create a mutually exclusive group for conflicting options
+  exclusive_group = parser.add_mutually_exclusive_group()
+
+  # Add options to the group
+  exclusive_group.add_argument("-h", "--help", action="store_true", help="Display help message")
+  exclusive_group.add_argument("-l", "--list", action="store_true", help="List files and directories")
   parser.add_argument("-d", "--directory", default=os.getcwd(), help="Set the starting directory")
-  parser.add_argument("-l", "--list", action="store_true", help="List files and directories")
   parser.add_argument("-c", "--copy", help="Copy a file or directory")
   parser.add_argument("-m", "--move", help="Move a file or directory")
   parser.add_argument("-r", "--rename", nargs=2, help="Rename a file or directory")
   parser.add_argument("-p", "--permission", help="Change file permissions")
-  parser.add_argument("-h", "--help", action="store_true", help="Display help message")
 
   args = parser.parse_args()
 
   # Set starting directory
   os.chdir(args.directory)
 
-  if args.list:
+  # Handle different commands based on parsed arguments
+  if args.help:
+    print_help()
+  elif args.list:
     list_files_and_directories()
   elif args.copy:
     copy_file_or_directory(args.copy)
@@ -30,10 +38,8 @@ def main():
     rename_file_or_directory(args.rename[0], args.rename[1])
   elif args.permission:
     change_file_permissions(args.permission)
-  elif args.help:
-    print_help()
   else:
-    print("No command specified. Use --help for available commands.")
+    print("No command specified. Use -h or --help for available commands.")
 
 def list_files_and_directories():
   """
