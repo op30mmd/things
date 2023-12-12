@@ -1,31 +1,36 @@
-from flask import Flask, request, send_file
+from fastapi import FastAPI, Request, File, UploadFile
 import requests
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/download", methods=["POST"])
-def download_file():
-  url = request.form["url"]
+@app.post("/download")
+async def download_file(url: str, file: UploadFile = None):
+  """
+  Download a file from a URL.
+
+  Args:
+      url: The URL of the file to download.
+      file: (optional) An uploaded file containing the download URL.
+
+  Returns:
+      A JSON response with the downloaded file content and filename.
+  """
 
   try:
+    if file:
+      # Get the URL from the uploaded file content
+      url = await file.read()
     # Make a request to the URL
     response = requests.get(url)
 
     # Check if the request was successful
     if response.status_code == 200:
-      # Get the filename from the response headers
-      filename = response.headers.get("Content-Disposition").split("filename=")[1]
+      # Generate a filename based on the URL
+      filename = url.split("/")[-1]
 
-      # Write the content to a file
-      with open(filename, "wb") as f:
-        f.write(response.content)
-
-      # Send the file to the user
-      return send_file(filename, as_attachment=True)
+      # Return the downloaded file content and filename
+      return {"filename": filename, "content": response.content}
     else:
-      return "Error: Could not download file.", 400
+      return {"error": "Error: Could not download file."}, 400
   except Exception as e:
-    return "Error: {}".format(e), 500
-
-if __name__ == "__main__":
-  app.run(debug=True)
+    return {"error": "Error: {}".format(e)}, 500
